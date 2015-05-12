@@ -258,5 +258,13 @@ public class RenderPrintWriter extends PrintWriter {
     } else {
       super.print(obj);
     }
+    
+    //EXPORT FILE IN ls COMMAND: add code
+    this.out.exportLSResult2File();
+  }
+  
+  //EXPORT FILE IN ls COMMAND:getOut()  
+  public RenderWriter getOut() {
+	return out;
   }
 }

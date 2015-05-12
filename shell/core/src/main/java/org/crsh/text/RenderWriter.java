@@ -24,6 +24,9 @@ import org.crsh.shell.ScreenContext;
 import java.io.Closeable;
 import java.io.IOException;
 import java.io.Writer;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.PrintWriter;
 
 public class RenderWriter extends Writer implements ScreenContext<Chunk> {
 
@@ -38,6 +41,34 @@ public class RenderWriter extends Writer implements ScreenContext<Chunk> {
 
   /** . */
   private boolean empty;
+  
+//BEGIN UPDATE: EXPORT FILE IN ls COMMAND
+ private ChunkBuffer buffer;
+ 
+ private String sLS_ExportPath = "/tmp/tempfile.txt";
+ 
+ public void setsLS_ExportPath(String sLS_ExportPath) {
+		this.sLS_ExportPath = sLS_ExportPath;
+ }
+ 
+ public void exportLSResult2File() {
+	  try {
+		  //File in = new File("/home/tunglt/writecrashgroovy.txt");
+		  File in = new File(sLS_ExportPath);
+		  if(in.exists()) {
+			  in.delete();			  
+		  }
+		  in.createNewFile();
+	      FileOutputStream fos = new FileOutputStream(sLS_ExportPath, true);
+	  	  PrintWriter ps = new PrintWriter(fos);
+	  	  ps.write(buffer.toString());
+	  	  ps.close();
+	  }
+	  catch (Exception e) {
+	  	  e.printStackTrace();
+	  }
+  }
+  // END UPDATE: EXPORT FILE IN ls COMMAND 
 
   public RenderWriter(ScreenContext out) throws NullPointerException {
     this(out, null);
@@ -52,6 +83,9 @@ public class RenderWriter extends Writer implements ScreenContext<Chunk> {
     this.out = out;
     this.empty = true;
     this.closeable = closeable;
+    
+    // EXPORT FILE IN ls COMMAND: buffer
+    buffer = new ChunkBuffer();
   }
 
   public boolean isEmpty() {
@@ -76,6 +110,9 @@ public class RenderWriter extends Writer implements ScreenContext<Chunk> {
       empty &= text.getText().length() == 0;
     }
     out.provide(element);
+    
+    // EXPORT FILE IN ls COMMAND
+    buffer.provide(element);
   }
 
   @Override
